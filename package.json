@@ -1,0 +1,11 @@
+{
+  "name": "com.blueoyster.logger-unity",
+  "version": "0.1.0",
+  "description": "Simple structured logger.",
+  "displayName": "logger-unity",
+  "author": {
+    "name": "Justin Awrey",
+    "email": "justin@justinawrey.com",
+    "url": "https://justinawrey.com"
+  }
+}
