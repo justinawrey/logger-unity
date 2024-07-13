@@ -1,79 +1,82 @@
 using System;
 using UnityEngine;
 
-public enum LogLevel
+namespace StructuredLogger
 {
-    None,
-    Info,
-    Verbose
-}
-
-[Serializable]
-public class Logger
-{
-    [SerializeField]
-    private LogLevel _editorLogLevel = LogLevel.Info;
-
-    [SerializeField]
-    private LogLevel _buildLogLevel = LogLevel.Verbose;
-
-    [SerializeField]
-    private string _prefix = "";
-
-    [SerializeField]
-    private Color _color = Color.green;
-
-    private string GetLogLevelPrefix(LogLevel logLevel) =>
-        logLevel switch
-        {
-            LogLevel.Info => "info",
-            LogLevel.Verbose => "verbose",
-            _ => ""
-        };
-
-    private string Now => DateTime.UtcNow.ToString("HH:mm:ss.ff");
-
-    private void LogRaw(LogLevel logLevel, bool timestamp, object message)
+    public enum LogLevel
     {
-        string timestampStr = timestamp ? $"[{Now}] " : "";
-        Debug.Log($"{timestampStr}({GetLogLevelPrefix(logLevel)}) {_prefix}: {message}");
+        None,
+        Info,
+        Verbose
     }
 
-    private void LogRichText(LogLevel logLevel, bool timestamp, object message)
+    [Serializable]
+    public class Logger
     {
-        string colorHex = ColorUtility.ToHtmlStringRGBA(_color);
-        string timestampStr = timestamp ? $"<b>{Now}</b> " : "";
+        [SerializeField]
+        private LogLevel _editorLogLevel = LogLevel.Info;
 
-        Debug.Log(
-            $"{timestampStr}<b>({GetLogLevelPrefix(logLevel)})</b> <color=#{colorHex}><b>{_prefix}</b></color>: {message}"
-        );
-    }
+        [SerializeField]
+        private LogLevel _buildLogLevel = LogLevel.Verbose;
 
-    public void Info(object message)
-    {
-        if (Application.isEditor && _editorLogLevel != LogLevel.None)
+        [SerializeField]
+        private string _prefix = "";
+
+        [SerializeField]
+        private Color _color = Color.green;
+
+        private string GetLogLevelPrefix(LogLevel logLevel) =>
+            logLevel switch
+            {
+                LogLevel.Info => "info",
+                LogLevel.Verbose => "verbose",
+                _ => ""
+            };
+
+        private string Now => DateTime.UtcNow.ToString("HH:mm:ss.ff");
+
+        private void LogRaw(LogLevel logLevel, bool timestamp, object message)
         {
-            LogRichText(LogLevel.Info, false, message);
-            return;
+            string timestampStr = timestamp ? $"[{Now}] " : "";
+            Debug.Log($"{timestampStr}({GetLogLevelPrefix(logLevel)}) {_prefix}: {message}");
         }
 
-        if (!Application.isEditor && _buildLogLevel != LogLevel.None)
+        private void LogRichText(LogLevel logLevel, bool timestamp, object message)
         {
-            LogRaw(LogLevel.Info, true, message);
-        }
-    }
+            string colorHex = ColorUtility.ToHtmlStringRGBA(_color);
+            string timestampStr = timestamp ? $"<b>{Now}</b> " : "";
 
-    public void Verbose(object message)
-    {
-        if (Application.isEditor && _editorLogLevel == LogLevel.Verbose)
-        {
-            LogRichText(LogLevel.Verbose, false, message);
-            return;
+            Debug.Log(
+                $"{timestampStr}<b>({GetLogLevelPrefix(logLevel)})</b> <color=#{colorHex}><b>{_prefix}</b></color>: {message}"
+            );
         }
 
-        if (!Application.isEditor && _buildLogLevel == LogLevel.Verbose)
+        public void Info(object message)
         {
-            LogRaw(LogLevel.Verbose, true, message);
+            if (Application.isEditor && _editorLogLevel != LogLevel.None)
+            {
+                LogRichText(LogLevel.Info, false, message);
+                return;
+            }
+
+            if (!Application.isEditor && _buildLogLevel != LogLevel.None)
+            {
+                LogRaw(LogLevel.Info, true, message);
+            }
+        }
+
+        public void Verbose(object message)
+        {
+            if (Application.isEditor && _editorLogLevel == LogLevel.Verbose)
+            {
+                LogRichText(LogLevel.Verbose, false, message);
+                return;
+            }
+
+            if (!Application.isEditor && _buildLogLevel == LogLevel.Verbose)
+            {
+                LogRaw(LogLevel.Verbose, true, message);
+            }
         }
     }
 }
