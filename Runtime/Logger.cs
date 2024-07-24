@@ -13,17 +13,10 @@ namespace StructuredLogger
     [Serializable]
     public class Logger
     {
-        [SerializeField]
-        private LogLevel _editorLogLevel = LogLevel.Info;
-
-        [SerializeField]
-        private LogLevel _buildLogLevel = LogLevel.Verbose;
-
-        [SerializeField]
-        private string _prefix = "";
-
-        [SerializeField]
-        private Color _color = Color.green;
+        public LogLevel EditorLogLevel = LogLevel.Info;
+        public LogLevel BuildLogLevel = LogLevel.Verbose;
+        public string Prefix = "";
+        public Color Color = Color.green;
 
         private string GetLogLevelPrefix(LogLevel logLevel) =>
             logLevel switch
@@ -38,28 +31,28 @@ namespace StructuredLogger
         private void LogRaw(LogLevel logLevel, bool timestamp, object message)
         {
             string timestampStr = timestamp ? $"[{Now}] " : "";
-            Debug.Log($"{timestampStr}({GetLogLevelPrefix(logLevel)}) {_prefix}: {message}");
+            Debug.Log($"{timestampStr}({GetLogLevelPrefix(logLevel)}) {Prefix}: {message}");
         }
 
         private void LogRichText(LogLevel logLevel, bool timestamp, object message)
         {
-            string colorHex = ColorUtility.ToHtmlStringRGBA(_color);
+            string colorHex = ColorUtility.ToHtmlStringRGBA(Color);
             string timestampStr = timestamp ? $"<b>{Now}</b> " : "";
 
             Debug.Log(
-                $"{timestampStr}<b>({GetLogLevelPrefix(logLevel)})</b> <color=#{colorHex}><b>{_prefix}</b></color>: {message}"
+                $"{timestampStr}<b>({GetLogLevelPrefix(logLevel)})</b> <color=#{colorHex}><b>{Prefix}</b></color>: {message}"
             );
         }
 
         public void Info(object message)
         {
-            if (Application.isEditor && _editorLogLevel != LogLevel.None)
+            if (Application.isEditor && EditorLogLevel != LogLevel.None)
             {
                 LogRichText(LogLevel.Info, false, message);
                 return;
             }
 
-            if (!Application.isEditor && _buildLogLevel != LogLevel.None)
+            if (!Application.isEditor && BuildLogLevel != LogLevel.None)
             {
                 LogRaw(LogLevel.Info, true, message);
             }
@@ -67,13 +60,13 @@ namespace StructuredLogger
 
         public void Verbose(object message)
         {
-            if (Application.isEditor && _editorLogLevel == LogLevel.Verbose)
+            if (Application.isEditor && EditorLogLevel == LogLevel.Verbose)
             {
                 LogRichText(LogLevel.Verbose, false, message);
                 return;
             }
 
-            if (!Application.isEditor && _buildLogLevel == LogLevel.Verbose)
+            if (!Application.isEditor && BuildLogLevel == LogLevel.Verbose)
             {
                 LogRaw(LogLevel.Verbose, true, message);
             }
